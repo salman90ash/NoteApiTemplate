@@ -4,6 +4,7 @@ from api.schemas.note import note_schema, notes_schema, NoteSchema, NoteRequistS
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, use_kwargs, doc
 
+
 @doc(tags=['Notes'])
 class NoteResource(MethodResource):
     @auth.login_required
@@ -48,6 +49,7 @@ class NoteResource(MethodResource):
         """
         raise NotImplemented("Метод не реализован")
         return note_dict, 200
+
 
 @doc(tags=['Notes'])
 class NotesListResource(MethodResource):
