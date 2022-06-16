@@ -3,6 +3,8 @@ from api.models.note import NoteModel
 from api.schemas.note import note_schema, notes_schema, NoteSchema, NoteRequistSchema
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, use_kwargs, doc
+from webargs import fields
+from api.models.tag import TagModel
 
 
 @doc(tags=['Notes'])
@@ -69,3 +71,29 @@ class NotesListResource(MethodResource):
         note = NoteModel(author_id=author.id, **kwargs)
         note.save()
         return note, 201
+
+
+@doc(tags=['Notes'])
+class NoteSetTagsResource(MethodResource):
+    @doc(summary="Set tags to Note")
+    @use_kwargs({"tags": fields.List(fields.Int())}, location=('json'))
+    @marshal_with(NoteSchema)
+    def put(self, note_id, **kwargs):
+        note = NoteModel.query.get(note_id)
+        if not note:
+            return {"error": f"note {note_id} not found"}
+        for tag_id in kwargs["tags"]:
+            tag = TagModel.query.get(tag_id)
+            note.tags.append(tag)
+        note.save()
+        return note, 200
+
+
+@doc(tags=['Notes'])
+class NotesListByUserResource(MethodResource):
+    @marshal_with(NoteSchema(many=True), code=200)
+    @doc(description='Get all notes by user_id')
+    @doc(summary='Get all notes by user_id')
+    def get(self, user_id):
+        notes = NoteModel.query.filter_by(author_id=user_id).all()
+        return notes_schema.dump(notes), 200

@@ -48,6 +48,7 @@ class UsersListResource(MethodResource):
         users = UserModel.query.all()
         return users, 200
 
+    @auth.login_required
     @doc(summary='Create new User')
     @marshal_with(UserSchema, code=201)
     @use_kwargs(UserRequestSchema, location='json')
