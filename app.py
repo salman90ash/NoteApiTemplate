@@ -24,6 +24,10 @@ api.add_resource(note.NotesListResource,
                  '/notes',  # GET, POST
                  )
 
+api.add_resource(note.NoteRestoreResource,
+                 '/notes/<int:note_id>/restore',  # GET, POST
+                 )
+
 api.add_resource(note.NotesListByUserResource,
                  '/users/<user_id>/notes')  # GET, PUT, DELETE
 
@@ -47,6 +51,7 @@ docs.register(UserResource)
 docs.register(UsersListResource)
 docs.register(note.NoteResource)
 docs.register(note.NotesListResource)
+docs.register(note.NoteRestoreResource)
 docs.register(TagsResource)
 docs.register(TagsListResource)
 docs.register(note.NoteSetTagsResource)

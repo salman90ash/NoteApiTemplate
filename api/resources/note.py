@@ -5,19 +5,20 @@ from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, use_kwargs, doc
 from webargs import fields
 from api.models.tag import TagModel
+from helpers.shortcuts import get_object_or_404
 
 
 @doc(tags=['Notes'])
 class NoteResource(MethodResource):
-    @auth.login_required
-    @doc(security=[{"basicAuth": []}])
+    # @auth.login_required
+    # @doc(security=[{"basicAuth": []}])
     @doc(summary="Get Note by id")
     @marshal_with(NoteSchema, 200)
     def get(self, note_id):
         """
         Пользователь может получить ТОЛЬКО свою заметку
         """
-        author = g.user
+        # author = g.user
         note = NoteModel.query.get(note_id)
         if not note:
             abort(404, error=f"Note with id={note_id} not found")
@@ -45,12 +46,11 @@ class NoteResource(MethodResource):
         note.save()
         return note_schema.dump(note), 200
 
+    @doc(summary="Delete note")
     def delete(self, note_id):
-        """
-        Пользователь может удалять ТОЛЬКО свои заметки
-        """
-        raise NotImplemented("Метод не реализован")
-        return note_dict, 200
+        note = get_object_or_404(NoteModel, note_id)
+        note.delete()
+        return {"message": f"Note with id={note}"}, 200
 
 
 @doc(tags=['Notes'])
@@ -97,3 +97,15 @@ class NotesListByUserResource(MethodResource):
     def get(self, user_id):
         notes = NoteModel.query.filter_by(author_id=user_id).all()
         return notes_schema.dump(notes), 200
+
+
+@doc(tags=['Notes'])
+# PUT /notes/<note_id>/restore
+class NoteRestoreResource(MethodResource):
+    @doc(summary="Restore Note")
+    @marshal_with(NoteSchema, code=200)
+    def put(self, note_id):
+        note = get_object_or_404(NoteModel, note_id)
+        note.is_archive = False
+        note.save()
+        return note, 200

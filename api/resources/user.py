@@ -3,7 +3,7 @@ from api.models.user import UserModel
 from api.schemas.user import user_schema, users_schema, UserSchema, UserRequestSchema
 from flask_apispec.views import MethodResource
 from flask_apispec import marshal_with, use_kwargs, doc
-
+from helpers.shortcuts import get_object_or_404
 
 @doc(tags=['Users'])
 class UserResource(MethodResource):
@@ -11,9 +11,10 @@ class UserResource(MethodResource):
     @doc(description='Full: Get User by id')
     @doc(summary='Get User by id')
     def get(self, user_id):
-        user = UserModel.query.get(user_id)
-        if user:
-            abort(403, error=f"User with id={user_id} not found")
+        # user = UserModel.query.get(user_id)
+        # if user:
+        #     abort(403, error=f"User with id={user_id} not found")
+        user = get_object_or_404(UserModel, user_id)
         return user, 200
 
     @doc(description='Edit User')
